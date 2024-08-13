@@ -8,8 +8,7 @@ Edite o arquivo defaults/login.yml e coloque seus dados de acesso ao seu OVirt.
 
 Edite o arquivo defaults/main.yml e coloque suas variáveis.
 
-
-
+Edite o arquivo de hosts. 
 
 
 ### :computer: PRÉ-REQUISITO FEDORA
@@ -19,7 +18,13 @@ sudo dnf install http://resources.ovirt.org/pub/yum-repo/ovirt-release44.rpm
 dnf install python-ovirt-engine-sdk4
 ```
 
+## :desktop_computer: PRÉ-REQUISITO UBUNTU 22.04
 
+- Para que seja possível executar o serviço [Create VMs Ovirt](https://git.cbm.sc.gov.br/cpd/playbooks/-/tree/master/services%2Fcreate-vms-ovirt) no Ubuntu 22.04, faz-se necessária a instalação/configuração dos seguintes pacotes:
+
+```bash
+sudo apt install -y python3 python3-dev python3-pip gcc libxml2-dev; cd /home/$USER && pip install ovirt-engine-sdk-python
+```
 
 ### Comando para execução direta
 
