@@ -1,0 +1,5 @@
+---
+- hosts: vm
+  connection: local 
+  roles:
+    - create-vms-ovirt

@@ -1,0 +1,33 @@
+---
+- import_tasks: auth.yml
+
+- name: SNAP - Info dos snaps para deletar.
+  ovirt_snapshot_info:
+    auth: "{{ ovirt_auth }}"
+    vm: "{{ item.name }}"
+    description: "{{ SNAP_NAME }}"
+  register: result
+
+- debug:
+    msg: "{{ result.ovirt_snapshots[0].id }}"
+
+- name: 'SNAP - Desligando a VM {{item.name}}'
+  ovirt_vm:
+    auth: "{{ ovirt_auth }}"
+    state: stopped
+    force: yes
+    name: "{{ item.name }}"
+  ignore_errors: yes
+
+- name: SNAP - "Restaura o snap {{ SNAP_NAME }} da vm {{ item.name }}".
+  ovirt_snapshot:
+    auth: "{{ ovirt_auth }}"
+    state: restore
+    vm_name: "{{ item.name }}"
+    snapshot_id: "{{ result.ovirt_snapshots[0].id }}"
+
+- name: 'SNAP - Start vms {{item.name}}'
+  ovirt_vm:
+    auth: "{{ ovirt_auth }}"
+    state: running
+    name: "{{ item.name }}"    

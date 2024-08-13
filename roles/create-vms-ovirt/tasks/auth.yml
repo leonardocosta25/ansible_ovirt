@@ -1,0 +1,6 @@
+---
+- name: AUTH - Gerando o "ovirt_auth" para autenticação no OVirt
+  ovirt_auth:
+    url: "{{ item.datacenter.url }}"
+    username: "{{ username }}"
+    password: "{{ password }}"

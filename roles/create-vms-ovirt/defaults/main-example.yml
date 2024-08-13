@@ -1,0 +1,40 @@
+---
+chave_ssh: XXXXXX
+
+
+list_vms: 
+ - { name: dev,
+    ip: IP DA SUA REDE,
+    rede: "{{ rede_1 }}",
+    dns: "8.8.8.8 1.1.1.1",
+    domain: "test.com",
+    hardware: "{{ hardware_padrao2 }}",
+    os: "{{ centos9 }}",
+    datacenter: "{{ engine2 }}",
+    tag_ovirt: dev,
+    locked: false,
+    tags: ["dev", "dev1"]
+    }   
+
+rede_1:
+  gateway: GW
+  vlan: VLAN
+
+centos7:
+  template: template_centos7_zerado
+  namedisk: teste_template_Disk1
+  nicname: eth0
+
+
+hardware_padrao2:
+  sizedisk: 100GiB
+  memory: 2GiB
+  memory_guaranteed: 1GiB
+  memory_max: 2GiB
+  cpu_sockets: 2
+
+engine2:
+  url: "ENDEREÇO DO SEU ENGINE" ex. https://engine.test.com/ovirt-engine/api  
+  url_engine: URL DO ENGINE "EX. engine.test.com"
+  cluster: NOME DO CLUSTER
+  storage_domain: NOME DO STORAGE DOMAIN  

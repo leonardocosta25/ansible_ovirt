@@ -1,0 +1,31 @@
+---
+
+- name: Restore snap zerado
+  import_tasks: snap.yml
+  when: RESTORE_SNAP
+
+- name: Import Del VMs.
+  import_tasks: delvms.yml
+  when: DELETE_VM
+
+- name: Import Create VMs.
+  import_tasks: createvms.yml
+  when: CREATE_VM
+  
+- name: Import Change Disk VMs.
+  import_tasks: changedisk.yml
+  when: CREATE_VM
+
+- name: REMOVE SSH KNOWN_HOSTS
+  file:
+    path: ~/.ssh/known_hosts
+    state: absent
+
+- name: AGUARDANDO IP DA VM SUBIR
+  shell: ping -c 4 -w 4 "{{item.ip}}"
+  ignore_errors: true
+  register: pingok
+  until: pingok.stdout.find("4 recebidos") != -1
+  retries: 10
+  delay: 5
+  

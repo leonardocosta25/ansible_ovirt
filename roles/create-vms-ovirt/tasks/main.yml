@@ -1,0 +1,9 @@
+---
+- include_vars: defaults/login.yml
+
+
+- name: Import Tasks to Create.
+  include_tasks: all.yml
+  loop: "{{ list_vms }}"
+  when:
+  - 'RUN in item.tags and item.locked == false'

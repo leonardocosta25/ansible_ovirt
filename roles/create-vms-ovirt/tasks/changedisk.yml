@@ -1,0 +1,21 @@
+---
+- import_tasks: auth.yml
+
+- name: CHANGEDISKS - Check info disks
+  ovirt_disk_info:
+    auth: "{{ ovirt_auth }}"
+    pattern: name="{{ item.os.namedisk }}" and "{{ item.name }}"
+  register: resultdisk
+
+- name: CHANGEDISKS - Set a variable var_disk.
+  set_fact:
+    var_disk: "{{resultdisk | json_query('ovirt_disks[0].id')}}"
+
+- name: CHANGEDISKS - Change Disk Name
+  ovirt_disk:
+    auth: "{{ ovirt_auth }}"
+    id: "{{ var_disk }}"
+    storage_domain: "{{ item.datacenter.storage_domain }}"
+    name: "{{ item.name }}_disk1"
+    vm_name: "{{ item.name }}"
+  when: var_disk != ""

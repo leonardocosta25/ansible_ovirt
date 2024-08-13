@@ -1,0 +1,103 @@
+---
+- import_tasks: auth.yml
+
+- name: 'CREATE - Creates a new Virtual Machine from template {{item.name}}'
+  ovirt_vm:
+    auth: "{{ ovirt_auth }}"
+    state: present
+    name: "{{ item.name }}"
+    template: "{{ item.os.template }}"
+    cluster: "{{ item.datacenter.cluster }}"
+    comment: "Servidor {{ item.name }}"
+    description: "Servidor {{ item.name }} Create by Ansible =)"
+    cpu_sockets: "{{ item.hardware.cpu_sockets }}"
+    memory: "{{ item.hardware.memory }}" #1024MiB
+    memory_guaranteed: "{{ item.hardware.memory_guaranteed }}"
+    memory_max: "{{ item.hardware.memory_max }}"
+    operating_system: rhel_7x64
+    timezone: "America/Sao_Paulo"
+    lease: "{{ item.datacenter.storage_domain }}"
+    clone: yes
+    high_availability: true
+    cloud_init_persist: yes
+    timeout: 1000
+    cloud_init:
+      dns_servers: "{{ item.dns }}"
+      dns_search: "{{ item.domain }}"
+      nic_boot_protocol: static
+      nic_ip_address: "{{ item.ip }}"
+      nic_netmask: 255.255.255.0
+      nic_gateway: "{{ item.rede.gateway }}"
+      nic_name: "{{ item.os.nicname }}"
+      host_name: "{{ item.name }}"
+      custom_script: |
+        runcmd:
+        - dnf install cloud-utils-growpart -y  
+        - growpart /dev/sda 2
+        - pvresize /dev/sda2
+        - lvextend -l +100%FREE /dev/*/root
+        - xfs_growfs /dev/*/root
+        - sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+        - service sshd restart
+        ssh_authorized_keys:
+        - "{{ chave_ssh }}"    
+      user_name: root
+      root_password: "123456"
+
+- name: CREATE - Remove NIC from VM
+  ovirt_nic:
+    auth: "{{ ovirt_auth }}"
+    state: absent
+    vm: "{{ item.name }}"
+    name: nic1
+
+- name: CREATE - Add NIC to VM
+  ovirt_nic:
+    auth: "{{ ovirt_auth }}"
+    state: present
+    vm: "{{ item.name }}"
+    name: nic1
+    profile: "{{ item.rede.vlan }}"
+    network: "{{ item.rede.vlan }}"
+
+- name: CREATE - Ajust size disk
+  ovirt_disk:
+    auth: "{{ ovirt_auth }}"
+    state: present
+    name: "{{ item.os.namedisk }}"
+    vm_name: "{{ item.name }}"
+    size: "{{ item.hardware.sizedisk }}"
+    wait: yes
+    wipe_after_delete: yes
+
+- name: CREATE - register vms
+  ovirt_vm:
+    auth: "{{ ovirt_auth }}"
+    state: registered
+    storage_domain: "{{ item.datacenter.storage_domain }}"
+    name: "{{ item.name }}"
+  
+- name: 'CREATE - start vms {{item.name}}'
+  ovirt_vm:
+    auth: "{{ ovirt_auth }}"
+    state: running
+    name: "{{ item.name }}"
+
+- name: CREATE - Criando tag no Ovirt
+  ovirt_tag:
+    auth: "{{ ovirt_auth }}"
+    name: "{{ item.tag_ovirt }}" 
+
+- name: CREATE - Atribuindo a tag nos servidores criados.
+  ovirt_tag:
+    auth: "{{ ovirt_auth }}"
+    name: "{{ item.tag_ovirt }}"
+    state: attached
+    vms: "{{ item.name }}"   
+
+- name: CREATE - Criando um snap zerado após criar as vms.
+  ovirt_snapshot:
+    auth: "{{ ovirt_auth }}"
+    vm_name: "{{ item.name }}"
+    description: "{{ SNAP_NAME }}"
+    use_memory: false

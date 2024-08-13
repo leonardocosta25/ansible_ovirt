@@ -1,0 +1,9 @@
+---
+- import_tasks: auth.yml
+
+- name: 'DELVMS - delete vms {{item.name}}'
+  ovirt_vm:
+    auth: "{{ ovirt_auth }}"
+    state: absent
+    name: "{{ item.name }}"
+  ignore_errors: yes
