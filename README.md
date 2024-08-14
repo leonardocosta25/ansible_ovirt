@@ -14,17 +14,24 @@ Edite o arquivo de hosts.
 ### :computer: PRÉ-REQUISITO FEDORA
 
 ```bash
-sudo dnf install http://resources.ovirt.org/pub/yum-repo/ovirt-release44.rpm
+ansible-galaxy collection install ovirt.ovirt
 dnf install python-ovirt-engine-sdk4
 ```
 
-## :desktop_computer: PRÉ-REQUISITO UBUNTU 22.04
+Caso precise, instale o repo:
+```bash
+sudo dnf install http://resources.ovirt.org/pub/yum-repo/ovirt-release44.rpm
+```
+
+### :desktop_computer: PRÉ-REQUISITO UBUNTU 22.04
 
 - Para que seja possível executar o serviço [Create VMs Ovirt](https://git.cbm.sc.gov.br/cpd/playbooks/-/tree/master/services%2Fcreate-vms-ovirt) no Ubuntu 22.04, faz-se necessária a instalação/configuração dos seguintes pacotes:
 
 ```bash
 sudo apt install -y python3 python3-dev python3-pip gcc libxml2-dev; cd /home/$USER && pip install ovirt-engine-sdk-python
 ```
+
+
 
 ### Comando para execução direta
 
